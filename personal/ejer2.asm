@@ -13,9 +13,21 @@ inicio:	mov ax, @data
 	mov ds, ax
 	xor ax, ax
 	;; ----------------
-	mov ax, num1
-	adc ax, num2
-	mov res, ax
+	clc			;Limpia el carry c=0
+	mov ax, [num1]
+	adc ax, [num2]
+	mov [res], ax
+	;; segundo word
+	mov ax, [num1 + 2]
+	adc ax, [num2 + 2]
+	mov [res + 2], ax
+	;; tercera word
+	mov ax, [num1 + 4]
+	adc ax, [num2 + 4]
+	mov [res + 4], ax
+	;; Sumar el ultimo acarreo
+	 adc [res + 6], 0
+	
 	
 
 salir:	mov ax, 4c00h
