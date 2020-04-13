@@ -1,0 +1,7 @@
+PASOS PARA ENSAMBLAR CON EL ENSABLADOR TURBO ENSAMBLE BAJO EL SISTEMA OPERATIVO MS-DOS
+1.-ENSAMBLAR EL .ASM PARA GENERAR EL CODIGO OBJETO
+	C:\>tasm eypc\personal\ejem.asm , eypc\persbin\
+2.-ENLAZAR EL .OBJ PARA GENERAR EL EJECUTABLE
+	C:\>tlink eypc\persbin\ejem.obj , eypc\persbin\test.exe
+3.-EJECUTAR
+	eypc\persbin\test.exe
