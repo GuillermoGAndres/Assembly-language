@@ -11,7 +11,7 @@ res		dw		?,?,?,?					;res de tipo word
 inicio:					;etiqueta inicio
 	mov ax,@data 		;AX = directiva @data, @data es una variable de sistema que contiene la direccion del segmento de datos 
 	mov ds,ax 			;DS = AX, inicializa segmento de datos
-;AQUI VA SU CODIGO
+; CODIGO
 	clc				;clear carry, C=0
 	mov ax,[num1]		;AX = [num1], copia el primer bloque de num1 en registro AX de tamano word
 	mov bx,[num2]		;BX = [num2], copia el primer bloque de num1 en registro BX de tamano word

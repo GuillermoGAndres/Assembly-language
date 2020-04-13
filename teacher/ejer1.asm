@@ -13,7 +13,7 @@ inicio:					;etiqueta inicio
 	mov ax,@data 		;AX = directiva @data, @data es una variable de sistema que contiene la direccion del segmento de datos 
 	mov ds,ax 			;DS = AX, inicializa segmento de datos
 	mov ax,0			;AX = 0000h, inicializar registro en 0s
-;AQUI VA SU CODIGO
+; CODIGO
 	mov al,[x]			;AL = [x], copia el contenido de x en registro AL de tamano byte (8 bits)
 	add al,[y]			;AL = AL + [y]
 	sub al,[z]			;AL = AL - [z]
