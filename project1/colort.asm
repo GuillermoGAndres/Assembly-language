@@ -15,8 +15,10 @@ inicio:
 	xor ax, ax
 
 	mov cx, 10d
-	
-	mov di, 0d
+
+	mov dh, 0d		;Row cursor
+	mov dl, 0d		;Column cursor
+	mov di, 0d		;Indice que se dezplaza
 loop1:
 	mov al, [texto + di]
 	mov ah, 09h
@@ -27,6 +29,10 @@ loop1:
 	int 10h
 	
 	inc contador
+	;; Mover el cursor
+	mov ah, 02h
+	int 10h
+	inc dh
 	inc di
 	 loop loop1
 
