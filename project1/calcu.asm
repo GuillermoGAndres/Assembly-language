@@ -8,10 +8,21 @@
 	.stack 64
 
 	.data
-	titulo		db	"Calculadora RETR"
-	color		db	1d 
-
+	titulo	db	"Calculadora RETR"
+	color	db	1d 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	num1	dw	01A2Eh
+	num2	dw	0BC1Ah
 	.code
+;;; SUMA con dos Operandos de 16 bits
+SUMA proc
+	mov bp, sp
+	mov bx, [bp+2]
+	add bx, [bp+4]
+	mov [bp+2], bx
+	ret
+	endp
+	
 inicio:
 	mov ax, @data
 	mov ds, ax
@@ -29,6 +40,13 @@ loop1:
 	inc di			;Para recorrer la cadena
 	loop loop1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	;;Suma
+	push [num1]
+	push [num2]
+	call SUMA 		;Deje en la pila el resultado
+	pop ax
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	
 salir:
 	mov ax, 4c00h
 	int 21h
