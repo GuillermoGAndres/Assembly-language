@@ -1,0 +1,61 @@
+Turbo Assembler	 Version 4.1	    04/21/20 16:47:47	    Page 1
+eypc\project1\otro.ASM
+
+
+
+      1
+      2	0000				     .model small
+      3	0000				     .stack 64
+      4
+      5	0000				     .data
+      6	0000  0607			     num     dw	     1543d
+      7	0002  270F			     num2    dw	     9999d
+      8
+      9	0004				     .code
+     10	0000  B8 0000s		     inicio: mov ax,@data
+     11	0003  8E D8			     mov ds, ax
+     12	0005  33 C0			     xor ax, ax
+     13
+     14	0007  A1 0000r			     mov ax,num
+     15	000A  03 06 0002r		     add ax,num2
+     16
+     17	000E			     salir:
+     18	000E  B8 4C00			     mov ax, 4c00h
+     19	0011  CD 21			     int 21h
+     20					     end inicio
+Turbo Assembler	 Version 4.1	    04/21/20 16:47:47	    Page 2
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "04/21/20"
+??FILENAME			  Text	 "otro	  "
+??TIME				  Text	 "16:47:47"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@CODE				  Text	 _TEXT
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 OTRO
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 2
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+INICIO				  Near	 _TEXT:0000
+NUM				  Word	 DGROUP:0000
+NUM2				  Word	 DGROUP:0002
+SALIR				  Near	 _TEXT:000E
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  STACK				  16  0040 Para	  Stack	  STACK
+  _DATA				  16  0004 Word	  Public  DATA
+_TEXT				  16  0013 Word	  Public  CODE
+
