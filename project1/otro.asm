@@ -1,3 +1,4 @@
+
 	title "afal"
 	.model small
 	.stack 64
