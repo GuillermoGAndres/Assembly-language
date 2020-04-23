@@ -457,14 +457,14 @@ ajustar2:
 	lea dx, salto
 	mov ah, 09h
 	int 21h
-;;; ;;;;;;;;;;;;;;;;;;;;
-	mov bx, num1
-	call IMPRIME_BX
+;;; ;;;;;;;;;;;;;;;;;;;
+				;	mov bx, num1
+				;	call IMPRIME_BX
 ;;; ;;;;;;;;;;;;;;
 	;; lea dx, salto;;mov ah, 09h;	int 21h			
-;;; ;;;;;;;;;;;;;;;;;;;;
-	mov bx, num2
-	call IMPRIME_BX
+;;; ;;;;;;;;;;;;;;;;;;;
+				;mov bx, num2
+				;call IMPRIME_BX
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;
 	lea dx, salto
 	mov ah, 09h
