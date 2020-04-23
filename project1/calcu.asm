@@ -44,6 +44,8 @@ endm
 	msgresta2	db	"La resta de ambos numeros es: un numero negativo$"
 	msgmulti	db	"La multiplicacion de ambos numeros es :$"
 	msgcocien	db	"La cociente de ambos numeros es :$"
+	msgresi		db	"La residuo de ambos numeros es :$"
+	
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;; num1	dw	01A2Eh
 	;; num2	dw	0BC1Ah
@@ -57,6 +59,7 @@ endm
 	num1	dw	0000d
 	num2	dw	0000d
 	poten	dw	0001d
+	aux	dw	?
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	.code
 ;;; SUMA con dos Operandos de 16 bits
@@ -139,7 +142,69 @@ IMPRIME_BX	proc  		;Se pasa un numero a traves del registro BX que se va a impri
 	imprime_caracter 0Ah 	;Macro para imprimir caracter
 							;0Ah es salto de linea
 	ret 					;intruccion ret para regresar de llamada a procedimiento
+	endp
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	
+IMPRIME_BX2	proc  		;Se pasa un numero a traves del registro BX que se va a imprimir con 5 digitos
+
+;Calcula digito de unidades de millar
+	mov ax,bx 				;Recuperamos el residuo de la division anterior y preparamos AX para hacer division
+	xor dx,dx 				;limpia registro DX, para extender AX a 32 bits
+	div [mil]				;Division de 16 bits => AX=cociente, DX=residuo
+							;El cociente contendrá el valor del dígito que puede ser entre 0 y 9. 
+							;Por lo tanto, AX=000Xh => AH=00h y AL=0Xh, donde X es un dígito entre 0 y 9
+							;Asumimos que el digito ya esta en AL
+							;El residuo se utilizara para los siguientes digitos
+	mov cx,dx 				;Guardamos el residuo anterior en un registro disponible para almacenarlo temporalmente
+							;debido a que modificaremos DX antes de usar ese residuo
+	;Imprime el digito unidades de millar
+	add al,30h				;Pasa el digito en AL a su valor ASCII
+	imprime_caracter al 	;Macro para imprimir caracter
+
+;Calcula digito de centenas
+	mov ax,cx 				;Recuperamos el residuo de la division anterior y preparamos AX para hacer division
+	xor dx,dx 				;limpia registro DX, para extender AX a 32 bits
+	div [cien]				;Division de 16 bits => AX=cociente, DX=residuo
+							;El cociente contendrá el valor del dígito que puede ser entre 0 y 9. 
+							;Por lo tanto, AX=000Xh => AH=00h y AL=0Xh, donde X es un dígito entre 0 y 9
+							;Asumimos que el digito ya esta en AL
+							;El residuo se utilizara para los siguientes digitos
+	mov cx,dx 				;Guardamos el residuo anterior en un registro disponible para almacenarlo temporalmente
+							;debido a que modificaremos DX antes de usar ese residuo
+	;Imprime el digito unidades de millar
+	add al,30h				;Pasa el digito en AL a su valor ASCII
+	imprime_caracter al 	;Macro para imprimir caracter
+
+;Calcula digito de decenas
+	mov ax,cx 				;Recuperamos el residuo de la division anterior y preparamos AX para hacer division
+	xor dx,dx 				;limpia registro DX, para extender AX a 32 bits
+	div [diez]				;Division de 16 bits => AX=cociente, DX=residuo
+							;El cociente contendrá el valor del dígito que puede ser entre 0 y 9. 
+							;Por lo tanto, AX=000Xh => AH=00h y AL=0Xh, donde X es un dígito entre 0 y 9
+							;Asumimos que el digito ya esta en AL
+							;El residuo se utilizara para los siguientes digitos
+	mov cx,dx 				;Guardamos el residuo anterior en un registro disponible para almacenarlo temporalmente
+							;debido a que modificaremos DX antes de usar ese residuo
+	;Imprime el digito unidades de millar
+	add al,30h				;Pasa el digito en AL a su valor ASCII
+	imprime_caracter al 	;Macro para imprimir caracter
+
+;Calcula digito de unidades
+	mov ax,cx 				;Recuperamos el residuo de la division anterior
+							;Para este caso, el residuo debe ser un número entre 0 y 9
+							;al hacer AX = CX, el residuo debe estar entre 0000h y 0009h
+							;=> AX = 000Xh -> AH=00h y AL=0Xh
+	;Imprime el digito unidades de millar
+	add al,30h				;Pasa el digito en AL a su valor ASCII
+	imprime_caracter al 	;Macro para imprimir caracter
+
+				;Imprimir salto de linea
+				;; imprime_caracter 0Ah
+				;Macro para imprimir caracter
+							;0Ah es salto de linea
+	ret 					;intruccion ret para regresar de llamada a procedimiento
 endp
+
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 inicio:
@@ -450,29 +515,65 @@ saltar:
 	mov ah, 09h
 	int 21h
 
+		
 	mov ax, num1
 	mul num2
 
+	div diezmil
+
 	mov bx, ax
+	mov aux, dx
+	
+	call IMPRIME_BX2
+
+	mov bx, aux		
+	call IMPRIME_BX2
+
+	lea dx, salto
+	mov ah, 09h
+	int 21h
+
+	lea dx, salto
+	mov ah, 09h
+	int 21h
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;DIVISION;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+	lea dx, msgcocien
+	mov ah, 09h
+	int 21h
+
+	;; Limpiamos dx para dejar preparado al cociente
+	xor dx,dx
+	mov ax,num1		;Que es dividiendo 00000:EA40h
+
+	mov bx, num2		;Es el divisor
+
+	div num2
+
+	mov bx, ax
+	mov aux, dx
+
 	call IMPRIME_BX
+
 
 	lea dx, salto
 	mov ah, 09h
 	int 21h
 
 
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;DIVISION;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	lea dx, msgresi
+	mov ah, 09h
+	int 21h
 
+;;; ;;;;;;;;;;;;;;;;;;;;;;COCIENTE;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	mov bx, aux
+	call IMPRIME_BX
 
-
-
-
-
-
-
-
-
-
+	lea dx, salto
+	mov ah, 09h
+	int 21h
+	
 	
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;PREGUNTAR AL USUARIO SI QUIERE VOLVER ENTRAR;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 preguntar:
