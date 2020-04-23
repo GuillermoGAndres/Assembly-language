@@ -1,5 +1,5 @@
 ;;; Calculadora en ensamblador
-;;; @autor : Andres Urbano Guillermo
+;;; @autor : Andres Urbano Guillermo Gerardo
 ;;; @date: April 14 2020
 
 	title "Calculadora"
@@ -45,6 +45,7 @@ endm
 	msgmulti	db	"La multiplicacion de ambos numeros es :$"
 	msgcocien	db	"La cociente de ambos numeros es :$"
 	msgresi		db	"La residuo de ambos numeros es :$"
+	msgcero		db	"Division entre 0 no esta definda,es como repartir 5 manzanas entre 0 personas$"
 	
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;; num1	dw	01A2Eh
@@ -539,10 +540,13 @@ saltar:
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;DIVISION;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-	lea dx, msgcocien
+	cmp num2,0000d
+	je cero
+	
+Nocero:	lea dx, msgcocien
 	mov ah, 09h
 	int 21h
-
+	
 	;; Limpiamos dx para dejar preparado al cociente
 	xor dx,dx
 	mov ax,num1		;Que es dividiendo 00000:EA40h
@@ -569,12 +573,18 @@ saltar:
 ;;; ;;;;;;;;;;;;;;;;;;;;;;COCIENTE;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	mov bx, aux
 	call IMPRIME_BX
-
-	lea dx, salto
+	jmp salicero
+	
+	
+cero:
+	lea dx, msgcero
 	mov ah, 09h
 	int 21h
 	
-	
+salicero:
+	lea dx, salto
+	mov ah, 09h
+	int 21h
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;PREGUNTAR AL USUARIO SI QUIERE VOLVER ENTRAR;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 preguntar:
 	
