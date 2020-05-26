@@ -9,7 +9,7 @@ title "Ejercicio de clase" ;codigo opcional. Descripcion breve del programa, el 
 ;Datos - Variables
 x		db		10
 y		db		20
-hola		db		"Hola mundo!",0Ah,0Dh,"$"
+hola		db		"Hola mundo!",0Ah,0Dh,"$" ;0Ah retorno de carro ,0Dh nueva linea
 adios		db		"Adios mundo!",0Ah,0Dh,"$"
 	.code				;segmento de codigo
 inicio:					;etiqueta inicio

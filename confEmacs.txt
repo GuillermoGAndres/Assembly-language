@@ -98,5 +98,20 @@
 ;(zjl-hl-enable-global 'java-mode)
 
 
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+emacs -nw //Para incicializar emacs en la terminal
+cr = Ctrol
+M = alt
+Cr-x Cr-f Abril un archivo y crear un archivo 
+Cr-x Cr-s //Guardar archivo
+cr-c 3 //Abril una ventana
+Cr-c c-o //Para moverte de ventanas
+m- %  //Reconociminetos de cadenas
+M-X shell //Terminal
+M-X comile //Compilador con make
+To cut the text, press C-w.
+To copy the text, press M-w.
+To paste the text, press C-y
+C-space seleccionar
+C-x-l kill buffer
 
