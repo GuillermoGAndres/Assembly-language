@@ -107,6 +107,7 @@ num1 		db 		digitos dup(0) 		;primer numero, en cada localidad guarda 1 digito, 
 num2 		db 		digitos dup(0)		;segundo numero, en cada localidad guarda 1 digito, puede ser hasta 4 digitos
 num1h		dw		0
 num2h		dw		0
+poten	dw	0001d	;Para la conversion del numero
 resultado	dw		0,0 			;resultado es un arreglo de 2 datos tipo word
 									;el primer dato [resultado] puede guardar el contenido del resultado para la suma, resta, cociente de division o residuo de division
 									;el segundo dato [resultado+2], en conjunto con [resultado] pueden almacenar la multiplicacion de dos numeros de 16 bits
@@ -115,6 +116,10 @@ conta2 		dw 		0
 operador 	db 		0
 num_boton 	db 		0
 num_impr 	db 		0
+
+aux	dw	?
+msgresta	db	"La resta de ambos numeros es :$"
+msgresta2	db	"La resta de ambos numeros es: un numero negativo$"
 
 ;Auxiliares para calculo de digitos de un numero decimal de hasta 5 digitos
 diezmil		dw		10000d
@@ -514,68 +519,409 @@ boton9_2:
 
 botonDEL_2:
 	;Todavia no le he dado una funcionalidad por eso puse ese jmp
-	jmp mouse_no_clic 
+	;Hacemos un decremento con conta1
+	;Pero antes guardamos su valor para despues imprimir el caracter vacio
+	mov ax, conta1
+
+	cmp [operador],0	;compara el valor del operador que puede ser 0, '+', '-', '*', '/', '%'
+	jne del_num2 		;Si el comparador es diferente de 0, es num2
+
+	;Comparamos si es unico numero esl que quiere eliminar de num1
+	cmp [conta1],1d
+	jle resetnum1
+
+
+	;Ahora limpiamos la parte izquierda qeu ya no cuenta como un numero
+	;Imprime el caracter vacio
+	mov [ren_aux],3 	;variable ren_aux para hacer operaciones en pantalla 
+						;ren_aux se mantiene fijo a lo largo del siguiente loop
+	mov [col_aux],58d 		;variable col_aux para hacer operaciones en pantalla 
+
+	sub [col_aux],al 		;Para calcular la columna en donde comienza a imprimir en pantalla de acuerdo a CX
+	posiciona_cursor [ren_aux],[col_aux] 	;Posiciona el cursor en pantalla usando ren_aux y col_aux
+	mov cl,00h				;Pasa valor ASCII signo del operando en ANSII
+	imprime_caracter_color cl,cAzulClaro	;Imprime caracter en CL, color blanco
+	
+	;Imprimmos el nuevo valor
+	sub [conta1], 1d
+	;Se imprime el numero del arreglo num1 de acuerdo a conta1
+	xor di,di 			;limpia DI para utilizarlo
+	mov cx,[conta1] 	;prepara CX para loop de acuerdo al numero de digitos introducidos
+	mov [ren_aux],3 	;variable ren_aux para hacer operaciones en pantalla 
+						;ren_aux se mantiene fijo a lo largo del siguiente loop
+	jmp imprime_num1
+
+resetnum1:
+	mov [conta1], 0d ;Reinicia a contador a cero
+	;Le ponemos vacio
+	mov [col_aux],57d 		;variable col_aux para hacer operaciones en pantalla 
+	mov [ren_aux],3 	;variable ren_aux para hacer operaciones en pantalla 
+	posiciona_cursor [ren_aux],[col_aux] 	;Posiciona el cursor en pantalla usando ren_aux y col_aux
+	mov cl,00h				;Pasa valor ASCII signo del operando en ANSII
+	imprime_caracter_color cl,cAzulClaro	;Imprime caracter en CL, color blanco
+	jmp mouse_no_clic
+
+del_num2:
+	;Comparamos si es unico numero es el que quiere eliminar de num2
+	cmp [conta2],1d
+	jle resetnum2
+
+	mov ax, [conta2]
+
+	;Ahora limpiamos la parte izquierda qeu ya no cuenta como un numero
+	;Imprime el caracter vacio
+	mov [ren_aux],5	;variable ren_aux para hacer operaciones en pantalla 
+						;ren_aux se mantiene fijo a lo largo del siguiente loop
+	mov [col_aux],58d 		;variable col_aux para hacer operaciones en pantalla 
+
+	sub [col_aux],al 		;Para calcular la columna en donde comienza a imprimir en pantalla de acuerdo a CX
+	posiciona_cursor [ren_aux],[col_aux] 	;Posiciona el cursor en pantalla usando ren_aux y col_aux
+	mov cl,00h				;Pasa valor ASCII signo del operando en ANSII
+	imprime_caracter_color cl,cAzulClaro	;Imprime caracter en CL, color blanco
+	
+	;Imprimmos el nuevo valor
+	sub [conta2], 1d
+	;Se imprime el numero del arreglo num1 de acuerdo a conta1
+	xor di,di 			;limpia DI para utilizarlo
+	mov cx,[conta2] 	;prepara CX para loop de acuerdo al numero de digitos introducidos
+	mov [ren_aux],5	;variable ren_aux para hacer operaciones en pantalla 
+						;ren_aux se mantiene fijo a lo largo del siguiente loop
+	jmp imprime_num2
+
+
+resetnum2:
+	;Si entra aqui sabemos que ya solo un numero pueda dar la alternativa de que borre el primer numero
+	;si quiere
+	mov [conta2], 0d ;Reinicia a contador a cero
+	;Le ponemos vacio
+	mov [col_aux],57d 		;variable col_aux para hacer operaciones en pantalla 
+	mov [ren_aux],5 	;variable ren_aux para hacer operaciones en pantalla 
+	posiciona_cursor [ren_aux],[col_aux] 	;Posiciona el cursor en pantalla usando ren_aux y col_aux
+	mov cl,00h				;Pasa valor ASCII signo del operando en ANSII
+	imprime_caracter_color cl,cAzulClaro	;Imprime caracter en CL, color blanco
+	
+	;Borramos el operador y lo inicializamos a cero
+	mov [operador], 0d
+	;Le ponemos vacio
+	mov [col_aux],57d 		;variable col_aux para hacer operaciones en pantalla 
+	mov [ren_aux],4 	;variable ren_aux para hacer operaciones en pantalla 
+	posiciona_cursor [ren_aux],[col_aux] 	;Posiciona el cursor en pantalla usando ren_aux y col_aux
+	mov cl,00h				;Pasa valor ASCII signo del operando en ANSII
+	imprime_caracter_color cl,cAzulClaro	;Imprime caracter en CL, color blanco
+
+	jmp mouse_no_clic
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 botonSuma_2:
 	mov [operador], 1d ; 1 = significara operacion suma
 	mov [col_aux],57d 		;variable col_aux para hacer operaciones en pantalla 
 	mov [ren_aux],4 	;variable ren_aux para hacer operaciones en pantalla 
 	posiciona_cursor [ren_aux],[col_aux] 	;Posiciona el cursor en pantalla usando ren_aux y col_aux
-	mov cl,2Bh				;Pasa valor ASCII signo +
+	mov cl,2Bh				;Pasa valor ASCII signo del operando en ANSII
 	imprime_caracter_color cl,cAzulClaro	;Imprime caracter en CL, color blanco
 	jmp mouse_no_clic
 
 botonResta_2:
 
-	mov [operador], 2d ; 3 = significara operacion MULT
+	mov [operador], 2d ;  = significara operacion resta
 	mov [col_aux],57d 		;variable col_aux para hacer operaciones en pantalla 
 	mov [ren_aux],4 	;variable ren_aux para hacer operaciones en pantalla 
 	posiciona_cursor [ren_aux],[col_aux] 	;Posiciona el cursor en pantalla usando ren_aux y col_aux
-	mov cl,2Dh				;Pasa valor ASCII signo +
+	mov cl,2Dh				;Pasa valor ASCII signo del operando en ANSII
 	imprime_caracter_color cl,cAzulClaro	;Imprime caracter en CL, color blanco
 	jmp mouse_no_clic
 
 botonMult_2:
-	mov [operador], 3d ; 3 = significara operacion MULT
+	mov [operador], 3d ; = significara operacion MULT
 	mov [col_aux],57d 		;variable col_aux para hacer operaciones en pantalla 
 	mov [ren_aux],4 	;variable ren_aux para hacer operaciones en pantalla 
 	posiciona_cursor [ren_aux],[col_aux] 	;Posiciona el cursor en pantalla usando ren_aux y col_aux
-	mov cl,2Ah				;Pasa valor ASCII signo +
+	mov cl,2Ah				;Pasa valor ASCII signo del operando en ANSII
 	imprime_caracter_color cl,cAzulClaro	;Imprime caracter en CL, color blanco
 	jmp mouse_no_clic
 
 botonDivC_2:
-	mov [operador], 4d ; 3 = significara operacion MULT
+	mov [operador], 4d ;  = significara operacion div Cociente
 	mov [col_aux],57d 		;variable col_aux para hacer operaciones en pantalla 
 	mov [ren_aux],4 	;variable ren_aux para hacer operaciones en pantalla 
 	posiciona_cursor [ren_aux],[col_aux] 	;Posiciona el cursor en pantalla usando ren_aux y col_aux
-	mov cl,2Fh				;Pasa valor ASCII signo +
+	mov cl,2Fh				;Pasa valor ASCII signo del operando en ANSII
 	imprime_caracter_color cl,cAzulClaro	;Imprime caracter en CL, color blanco
 	jmp mouse_no_clic
 
 botonDivR_2:
-	mov [operador], 5d ; 3 = significara operacion MULT
+	mov [operador], 5d ;  = significara operacion division residu
 	mov [col_aux],57d 		;variable col_aux para hacer operaciones en pantalla 
 	mov [ren_aux],4 	;variable ren_aux para hacer operaciones en pantalla 
 	posiciona_cursor [ren_aux],[col_aux] 	;Posiciona el cursor en pantalla usando ren_aux y col_aux
-	mov cl,25h				;Pasa valor ASCII signo +
+	mov cl,25h				;Pasa valor ASCII signo del operando en ANSII
 	imprime_caracter_color cl,cAzulClaro	;Imprime caracter en CL, color blanco
 	jmp mouse_no_clic
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;,,
 
 botonIgual_2:
+	;Limpiar el numero si quiere volver a intentarlo hacer
+	;Le ponemos vacio
+	mov cx, 9d
+	xor ax, ax
+	mov al, 58d
+limp:
+	push cx
+	push ax
+	mov [col_aux],al 		;variable col_aux para hacer operaciones en pantalla 
+	mov [ren_aux],6 	;variable ren_aux para hacer operaciones en pantalla 
+	posiciona_cursor [ren_aux],[col_aux] 	;Posiciona el cursor en pantalla usando ren_aux y col_aux
+	mov cl,00h				;Pasa valor ASCII signo del operando en ANSII
+	imprime_caracter_color cl,cAzulClaro	;Imprime caracter en CL, color blanco
+	pop ax
+	sub al, 1d
+	pop cx
+	loop limp
+
+
+	;Dibujamos el igual
+	mov [col_aux],48d 		;variable col_aux para hacer operaciones en pantalla 
+	mov [ren_aux],6 	;variable ren_aux para hacer operaciones en pantalla 
+	posiciona_cursor [ren_aux],[col_aux] 	;Posiciona el cursor en pantalla usando ren_aux y col_aux
+	mov cl,3Dh				;Pasa valor ASCII signo del operando en ANSII
+	imprime_caracter_color cl,cAmarillo	;Imprime caracter en CL, color blanco
+
 	;Todavia no le he dado una funcionalidad por eso puse ese jmp
 	;Se supone que cuando presione igual tendremos los dos numeros en memoria, es decir
 	;num1 = xxxx
 	;num2 = yyyy
-	;Convertir esos numeros ASCII en numeros reales que pueda entender el computer
-	;Despues faltaria  es hacer las operaciones correspodientes suma,resta,mul,div,mod
+	;Tareas por hacer para funcionalidad
+	;1.-Convertir esos numeros ASCII en numeros reales que pueda entender el computer
+	;2.-Despues faltaria  es hacer las operaciones correspodientes suma,resta,mul,div,mod
 
+	;Reajustamos los valores por defecto por si se quiere volver hacerlo
+	mov num1h, 0
+	mov num2h, 0
+	mov poten, 0001d ;Reiniciamos valores
+
+	;Convertir el primer numero (num1)
+	mov cx, conta1
+	mov di, cx
+	dec di ; Por el ultimo del arreglo es tres en el caso que sea 4 digitos, e.g:
+	;[7 | 3 | 5 | 2]
+	; 0   1   2   3 
+	;; Convertimos nuestro digitos ascii en numeros
+ajustar:
+	mov ax, poten
+	mov bh,00d
+	mov bl, [num1+di] ; num1*potenc 
+	mul bx
+	add num1h, ax      ; num1h = num1h + num1*potenc
+
+	mov ax,10d
+	mul poten
+	mov poten, ax   ;Aumentamos unidades 1, 10, 100, 1000 en cada ciclo
+	dec di          ; Ir recorriendo el numero 3, 2 , 1, 0
+	loop ajustar
+
+	mov ax, num1h	;Verificamos el numero
+	xor ax, ax
+
+	;Convertir el segundo numero (num2)
+	mov poten, 0001d
+	mov cx, conta2
+
+	mov di, cx
+	dec di
+	
+	;; Convertimos nuestro digitos ascii en numeros
+ajustar2:
+	mov ax, poten
+	mov bh,00d
+	mov bl, [num2+di]
+	mul bx
+	add num2h, ax
+
+	mov ax,10d
+	mul poten
+	mov poten, ax
+	dec di
+	loop ajustar2
+
+	mov ax, num2h
+	xor ax, ax
+
+	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;,,
+	;Test para conocer los valores que que sean registrados num1h y num2h correctamente
+	
+	;mov bx, num1h	
+	;mov [col_aux],40d 		;variable col_aux para hacer operaciones en pantalla 
+	;mov [ren_aux],4 	;variable ren_aux para hacer operaciones en pantalla 
+	;call IMPRIME_BX
+
+
+	;mov bx, num2h 
+	;mov [col_aux],40d 		;variable col_aux para hacer operaciones en pantalla 
+	;mov [ren_aux],5	;variable ren_aux para hacer operaciones en pantalla 
+	;call IMPRIME_BX
+
+	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;,
+
+	;2.-Despues faltaria  es hacer las operaciones correspodientes suma,resta,mul,div,mod
+	;Ajustamos la posicion para el resultado para cualquier operacion en el momento de la impresion
+	mov [col_aux],53d 		;variable col_aux para hacer operaciones en pantalla 
+	mov [ren_aux],6 	;variable ren_aux para hacer operaciones en pantalla 
+
+	;Hacemos comparaciones para saber que operacion es la correspodiente
+	cmp [operador], 1d
+	je suma
+	cmp [operador], 2d
+	je resta
+	cmp [operador], 3d
+	je multipli
+	cmp [operador], 4d
+	je division
+	cmp [operador], 5d
+	je modulo
+
+
+
+	jmp mouse_no_clic ; nunca entra este caso pero por si las moscas
+	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+suma:
+	mov bx, num1h
+	add bx, num2h
+	;posiciona_cursor [ren_aux],[col_aux] 	;Posiciona el cursor en pantalla usando ren_aux y col_aux
+	call IMPRIME_BX
 	jmp mouse_no_clic 
 
+resta:
+	mov bx, num1h
+	sub bx, num2h
+	js negativo
+	jmp positivo
 
-
+negativo:
+	;Se debe utilizar el complemento a dos para conocer el valor e imprimir el signo
+	;1.-Imprimir el signo
+	push bx ;Guardamos el valor, por si se modifica en el momento de imprimir el signo
+	mov [col_aux],53d 		;variable col_aux para hacer operaciones en pantalla 
+	mov [ren_aux],6 	;variable ren_aux para hacer operaciones en pantalla 
+	posiciona_cursor [ren_aux],[col_aux] 	;Posiciona el cursor en pantalla usando ren_aux y col_aux
+	mov cl,2Dh				;Pasa valor ASCII signo 
+	imprime_caracter_color cl,cBlanco	;Imprime caracter en CL, color blanco
 	
+	;2Complemento a dos 
+	pop bx ;obtenemos el valor guardado de la pila
+	neg bx
+	;Ajustamos la posicion para el resultado para cualquier operacion en el momento de la impresion
+	mov [col_aux],54d 		;variable col_aux para hacer operaciones en pantalla 
+	mov [ren_aux],6 	;variable ren_aux para hacer operaciones en pantalla 
+
+	call IMPRIME_BX
+	jmp mouse_no_clic
+
+positivo:
+	call IMPRIME_BX
+	jmp mouse_no_clic
+
+multipli:
+
+	mov ax, num1h
+	mul num2h
+
+	div diezmil
+
+	mov bx, ax
+	mov aux, dx
+	
+	;Ajustamos la posicion para el resultado para cualquier operacion en el momento de la impresion
+	mov [col_aux],50d 		;variable col_aux para hacer operaciones en pantalla 
+	mov [ren_aux],6 	;variable ren_aux para hacer operaciones en pantalla 
+
+	call IMPRIME_BX
+
+	;Ajustamos la posicion para el resultado para cualquier operacion en el momento de la impresion
+	mov [col_aux],54d 		;variable col_aux para hacer operaciones en pantalla 
+	mov [ren_aux],6 	;variable ren_aux para hacer operaciones en pantalla 
+
+	mov bx, aux		
+	call IMPRIME_BX
+
+	jmp mouse_no_clic
+
+division:
+	
+	;Comparamos si es cero
+	cmp num2h,0000d
+	je cero
+	
+Nocero:	
+	;; Limpiamos dx para dejar preparado al cociente
+	xor dx,dx
+	mov ax,num1h		;Que es dividiendo 00000:EA40h
+
+	mov bx, num2h		;Es el divisor
+
+	div num2h
+
+	mov bx, ax
+	mov aux, dx   ;Guardamos nuestro residuo
+
+	call IMPRIME_BX
+
+	;COCIENTE
+	;mov bx, aux
+	;call IMPRIME_BX
+	;jmp salicero
+	jmp mouse_no_clic
+
+cero:
+	
+	;Vamo imprimir NaN
+	mov [col_aux],57d 		;variable col_aux para hacer operaciones en pantalla 
+	mov [ren_aux],6 	;variable ren_aux para hacer operaciones en pantalla 
+	posiciona_cursor [ren_aux],[col_aux] 	;Posiciona el cursor en pantalla usando ren_aux y col_aux
+	mov cl,4Eh				;Pasa valor ASCII signo del operando en ANSII
+	imprime_caracter_color cl,cRojoClaro	;Imprime caracter en CL, color blanco
+
+	mov [col_aux],56d 		;variable col_aux para hacer operaciones en pantalla 
+	mov [ren_aux],6 	;variable ren_aux para hacer operaciones en pantalla 
+	posiciona_cursor [ren_aux],[col_aux] 	;Posiciona el cursor en pantalla usando ren_aux y col_aux
+	mov cl,61h				;Pasa valor ASCII signo del operando en ANSII
+	imprime_caracter_color cl,cRojoClaro	;Imprime caracter en CL, color blanco
+	
+	mov [col_aux],55d 		;variable col_aux para hacer operaciones en pantalla 
+	mov [ren_aux],6 	;variable ren_aux para hacer operaciones en pantalla 
+	posiciona_cursor [ren_aux],[col_aux] 	;Posiciona el cursor en pantalla usando ren_aux y col_aux
+	mov cl,4Eh				;Pasa valor ASCII signo del operando en ANSII
+	imprime_caracter_color cl,cRojoClaro	;Imprime caracter en CL, color blanco
+	
+	jmp mouse_no_clic
+
+modulo:
+	
+	;Comparamos si es cero
+	cmp num2h,0000d
+	je cero
+	
+	;; Limpiamos dx para dejar preparado al cociente
+	xor dx,dx
+	mov ax,num1h		;Que es dividiendo 00000:EA40h
+
+	mov bx, num2h		;Es el divisor
+
+	div num2h
+
+	mov bx, ax
+	mov aux, dx   ;Guardamos nuestro residuo
+
+	;call IMPRIME_BX
+
+	;COCIENTE
+	mov bx, aux
+	call IMPRIME_BX
 
 
 	jmp mouse_no_clic
@@ -650,7 +996,7 @@ lee_num2:
 	inc [conta2] 		;incrementa conta1 por numero correctamente leido
 	;;;;;;;;;;;;;;;;;;;;
 
-	;Se imprime el numero del arreglo num1 de acuerdo a conta1
+	;Se imprime el numero del arreglo num1 de acuerdo a conta2
 	xor di,di 			;limpia DI para utilizarlo
 	mov cx,[conta2] 	;prepara CX para loop de acuerdo al numero de digitos introducidos
 	mov [ren_aux],5 	;variable ren_aux para hacer operaciones en pantalla 
