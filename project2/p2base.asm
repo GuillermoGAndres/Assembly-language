@@ -1,4 +1,5 @@
 title "EyPC 2020-II Grupo 2 Proyecto 2 - Base"
+;@author: Andres Urbano Guillermo Gerardo
 	.model small
 	.386
 	.stack 64
