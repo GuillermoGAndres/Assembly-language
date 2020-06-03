@@ -6,6 +6,11 @@ Turbo Assembler (TASM)
 - First Project 1
 ## Calculadora
 ![imagn](img/calculadora.jpg)
-- Second item
-- Third item
-- Fourth item 
+- Suma
+- Resta
+- Multiplicacion
+- Division
+- Modulo
+
+## Calculadora Grafica
+![imgn] (project2/img/suma.png)
