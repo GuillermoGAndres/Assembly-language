@@ -14,3 +14,4 @@ Turbo Assembler (TASM)
 # Second Project 2
 ## Calculadora Grafica
 ![imagn](/project2/img/suma.PNG)
+![div entre cero] (/project2/img/divzero.PNG)
