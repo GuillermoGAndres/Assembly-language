@@ -1,2 +1,2 @@
 # Calculadora Grafica
-![imagn](img/resta.png)
+![imagn](img/div.PNG)
